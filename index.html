@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نموذج البرنامج المدرسي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: 'Calibri', sans-serif;
+            font-size: 14px;
+            padding: 20px;
+            margin: auto;
+            max-width: 900px;
+            text-align: right;
+        }
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        .field {
+            flex: 1 1 calc(50% - 10px);
+            border: 1px solid #999;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, select {
+            width: 100%;
+            max-width: 100%;
+            padding: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            font-family: 'Calibri';
+            text-align: center;
+            border: 1px solid #999;
+            background-color: #fff;
+        }
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: none;
+        }
+        .date-container {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            direction: ltr; 
+        }
+        .date-container select {
+            flex: 1;
+            text-align: center;
+            direction: rtl;
+        }
+        .editable-box {
+            min-height: 100px;
+            border: 1px solid #999;
+            padding: 10px;
+            background-color: #fff;
+            box-sizing: border-box;
+            font-family: 'Calibri', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: right;
+        }
+        .image-box {
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: #fff;
+        }
+        .image-box img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+            margin: auto;
+        }
+        .signature {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .signature-box {
+            flex: 1 1 calc(50% - 10px);
+            border: 1px solid #999;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #fff;
+            font-weight: bold;
+            font-size: 15px;
+            text-align: center;
+        }
+        .buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        button {
+            font-family: 'Calibri';
+            font-size: 14px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+        @media print {
+            body {
+                margin: 0 !important;
+                padding: 10px !important;
+            }
+            img {
+                width: 100% !important;
+                height: auto !important;
+            }
+            .row {
+                margin-bottom: 10px !important;
+                gap: 10px !important;
+            }
+            .no-print,
+            input[type="file"],
+            .buttons {
+                display: none !important;
+            }
+            .field,
+            input,
+            select,
+            .editable-box,
+            .image-box,
+            .signature-box {
+                border: 1px solid #999 !important;
+                background-color: #fff !important;
+                box-shadow: none !important;
+                max-width: 100% !important;
+            }
+            .date-container select {
+                max-width: 100% !important;
+                width: 100% !important;
+                padding: 8px !important;
+                font-size: 14px !important;
+                box-sizing: border-box !important;
+            }
+        }
+        @media screen and (max-width: 600px) {
+            .date-container select {
+                font-size: 16px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <img src="https://i.ibb.co/cSbvtZmw/1.png" alt="Header Image" style="width: 100%; height: auto; margin-bottom: 20px;">
+
+    <div class="row">
+        <div class="field">
+            <label>اسم البرنامج:</label>
+            <input type="text" id="programName">
+        </div>
+        <div class="field">
+            <label>مجال البرنامج:</label>
+            <select id="programType">
+                <option>نمائي</option>
+                <option>وقائي</option>
+                <option>علاجي</option>
+                <option>تربوي</option>
+                <option>أخرى</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="field">
+            <label>تاريخ البرنامج (هجري - سنة/شهر/يوم):</label>
+            <div class="date-container">
+                <select id="hijriYear">
+                    <option value="">السنة</option>
+                    <option value="1447">1447</option>
+                    <option value="1448">1448</option>
+                    <option value="1449">1449</option>
+                    <option value="1450">1450</option>
+                </select>
+                <select id="hijriMonth">
+                    <option value="">الشهر</option>
+                    <option value="1">محرم</option>
+                    <option value="2">صفر</option>
+                    <option value="3">ربيع الأول</option>
+                    <option value="4">ربيع الآخر</option>
+                    <option value="5">جمادى الأولى</option>
+                    <option value="6">جمادى الآخرة</option>
+                    <option value="7">رجب</option>
+                    <option value="8">شعبان</option>
+                    <option value="9">رمضان</option>
+                    <option value="10">شوال</option>
+                    <option value="11">ذو القعدة</option>
+                    <option value="12">ذو الحجة</option>
+                </select>
+                <select id="hijriDay">
+                    <option value="">اليوم</option>
+                </select>
+            </div>
+        </div>
+        <div class="field">
+            <label>المنفذون:</label>
+            <select id="executors">
+                <option>الموجه الطلابي</option>
+                <option>الموجه الطلابي ورائد النشاط</option>
+                <option>الموجه الطلابي وأمين مركز المصادر</option>
+                <option>أخرى</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="field">
+            <label>عدد المستفيدين:</label>
+            <input type="number" id="beneficiaryCount">
+        </div>
+        <div class="field">
+            <label>المستفيدون:</label>
+            <select id="beneficiaries">
+                <option>جميع منسوبي المدرسة</option>
+                <option>جميع الطلاب</option>
+                <option>صف محدد</option>
+                <option>فصل محدد</option>
+                <option>طلاب محددون</option>
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <div class="field">
+            <label>الأهداف:</label>
+            <div contenteditable="true" id="goals" class="editable-box" onpaste="handlePaste(event)"></div>
+        </div>
+        <div class="field">
+            <label>طريقة التنفيذ:</label>
+            <div contenteditable="true" id="executionMethod" class="editable-box" onpaste="handlePaste(event)"></div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="field">
+            <label>الشاهد الأول:</label>
+            <input type="file" accept="image/*" class="no-print" onchange="handleWitness(this, 'witness1')" style="margin-bottom: 10px;">
+            <div id="witness1" class="image-box"></div>
+        </div>
+        <div class="field">
+            <label>الشاهد الثاني:</label>
+            <input type="file" accept="image/*" class="no-print" onchange="handleWitness(this, 'witness2')" style="margin-bottom: 10px;">
+            <div id="witness2" class="image-box"></div>
+        </div>
+    </div>
+
+    <div class="signature">
+        <div class="signature-box">الموجه الطلابي: عبدالسلام العوفي</div>
+        <div class="signature-box">مدير المدرسة: طالب الحازمي</div>
+    </div>
+
+    <div class="buttons no-print">
+        <button onclick="window.print()">🖨️ طباعة النموذج / حفظ كـ PDF</button>
+        <button onclick="clearForm()">🧹 مسح النموذج</button>
+    </div>
+
+    <script>
+        function handlePaste(e) {
+            e.preventDefault();
+            let text = (e.clipboardData || window.clipboardData).getData('text/plain');
+            document.execCommand('insertText', false, text);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const daySelect = document.getElementById('hijriDay');
+            for (let i = 1; i <= 30; i++) { 
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+                daySelect.appendChild(option);
+            }
+        });
+
+        function handleWitness(input, targetId) {
+            const container = document.getElementById(targetId);
+            container.innerHTML = '';
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.maxWidth = '100%';
+                    img.style.maxHeight = '100%';
+                    img.style.objectFit = 'contain';
+                    img.style.display = 'block';
+                    img.style.margin = 'auto';
+                    container.appendChild(img);
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function clearForm() {
+            document.querySelectorAll('input, select').forEach(el => el.value = '');
+            document.getElementById('hijriYear').value = '';
+            document.getElementById('hijriMonth').value = '';
+            document.getElementById('hijriDay').value = '';
+
+            document.getElementById('executionMethod').innerText = '';
+            document.getElementById('goals').innerText = '';
+            document.getElementById('witness1').innerHTML = '';
+            document.getElementById('witness2').innerHTML = '';
+        }
+    </script>
+
+</body>
+</html>
