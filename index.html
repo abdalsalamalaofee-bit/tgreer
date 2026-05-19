@@ -69,6 +69,7 @@
             font-size: 14px;
             line-height: 1.5;
             text-align: right;
+            white-space: pre-wrap; /* للمحافظة على تنسيق الأسطر الجديدة */
         }
         .image-box {
             margin-top: 10px;
@@ -115,6 +116,12 @@
             font-size: 14px;
             padding: 10px 20px;
             cursor: pointer;
+        }
+        .loading-text {
+            font-size: 12px;
+            color: #666;
+            font-weight: normal;
+            margin-right: 10px;
         }
         @media print {
             body {
@@ -167,8 +174,11 @@
 
     <div class="row">
         <div class="field">
-            <label>اسم البرنامج:</label>
-            <input type="text" id="programName">
+            <label>اسم البرنامج: <span id="loadingStatus" class="loading-text">جاري تحميل البرامج من الشيت...</span></label>
+            <!-- تم تحويل حقل الإدخال النصي إلى قائمة منسدلة ليتم تعبئتها تلقائياً -->
+            <select id="programName" onchange="updateProgramDetails()">
+                <option value="">-- اختر البرنامج --</option>
+            </select>
         </div>
         <div class="field">
             <label>مجال البرنامج:</label>
@@ -275,6 +285,10 @@
     </div>
 
     <script>
+        // رابط بيانات الـ Google Sheet بصيغة CSV المستخرجة مباشرة من الرابط الخاص بك لورقة pro
+        const sheetUrl = "https://docs.google.com/spreadsheets/d/1iOIcTIHZSBagnXvhfmOQ_wz-KTWKPMEo1i3RVpiV_8k/gviz/tq?tqx=out:csv&sheet=pro";
+        let programsData = [];
+
         function handlePaste(e) {
             e.preventDefault();
             let text = (e.clipboardData || window.clipboardData).getData('text/plain');
@@ -289,7 +303,111 @@
                 option.textContent = i;
                 daySelect.appendChild(option);
             }
+            
+            // جلب البيانات من قوقل شيت فور تحميل الصفحة
+            fetchSheetData();
         });
+
+        // دالة جلب ومعالجة البيانات من قوقل شيت
+        async function fetchSheetData() {
+            try {
+                const response = await fetch(sheetUrl);
+                const data = await response.text();
+                
+                // تحويل بيانات الـ CSV إلى مصفوفة كائنات
+                programsData = parseCSV(data);
+                
+                const programSelect = document.getElementById('programName');
+                const loadingStatus = document.getElementById('loadingStatus');
+                
+                // ملء القائمة المنسدلة بأسماء البرامج المتاحة
+                programsData.forEach((prog, index) => {
+                    if(prog.name && prog.name.trim() !== "") {
+                        const option = document.createElement('option');
+                        option.value = index;
+                        option.textContent = prog.name;
+                        programSelect.appendChild(option);
+                    }
+                });
+                
+                loadingStatus.textContent = "✓ تم تحميل البرامج بنجاح";
+                loadingStatus.style.color = "green";
+            } catch (error) {
+                console.error("Error fetching sheet data:", error);
+                document.getElementById('loadingStatus').textContent = "⚠️ فشل تحميل البيانات من الشيت";
+                document.getElementById('loadingStatus').style.color = "red";
+            }
+        }
+
+        // دالة تفكيك الـ CSV مخصصة للتعامل مع الفواصل وعلامات الاقتباس داخل الأسطر
+        function parseCSV(text) {
+            const lines = text.split(/\r?\n/);
+            const result = [];
+            
+            // تخطي السطر الأول (العناوين مثل: م، اسم البرنامج، الأهداف، طرق التنفيذ)
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i]) continue;
+                
+                // تعبير نمطي لتقسيم السطر مع مراعاة النصوص المحاطة بعلامات اقتباس وبها أسطر جديدة
+                let arr = [];
+                let row = lines[i];
+                let inQuotes = false;
+                let currentField = '';
+                
+                for (let j = 0; j < row.length; j++) {
+                    let char = row[j];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        arr.push(currentField);
+                        currentField = '';
+                    } else {
+                        currentField += char;
+                    }
+                }
+                arr.push(currentField);
+                
+                // تنظيف النصوص الناتجة من علامات الاقتباس الزائدة والرموز الغريبة (\n و \r)
+                let cleanArr = arr.map(item => {
+                    return item.replace(/^"|"$/g, '').replace(/""/g, '"').replace(/\\n/g, '\n').trim();
+                });
+
+                // تجميع الأهداف وطرق التنفيذ المتكررة لنفس البرنامج إذا كانت مقسمة على أسطر متعددة بالشيت
+                // العمود 1: اسم البرنامج، العمود 2: الأهداف، العمود 3: طريقة التنفيذ
+                if (cleanArr[1]) {
+                    result.push({
+                        name: cleanArr[1],
+                        goals: cleanArr[2] ? cleanArr[2] : '',
+                        method: cleanArr[3] ? cleanArr[3] : ''
+                    });
+                } else if (result.length > 0) {
+                    // إذا كان اسم البرنامج فارغاً، فهذا يعني أنه تابع للأهداف السابقة في السطر العلوي
+                    if(cleanArr[2]) result[result.length - 1].goals += '\n' + cleanArr[2];
+                    if(cleanArr[3]) result[result.length - 1].method += '\n' + cleanArr[3];
+                }
+            }
+            return result;
+        }
+
+        // دالة تحديث الحقول وتعبئتها تلقائياً بناءً على البرنامج المختار
+        function updateProgramDetails() {
+            const selectElement = document.getElementById('programName');
+            const selectedIndex = selectElement.value;
+            
+            const goalsBox = document.getElementById('goals');
+            const methodBox = document.getElementById('executionMethod');
+            
+            if (selectedIndex !== "") {
+                const selectedProgram = programsData[selectedIndex];
+                
+                // ملء المربعات بالنصوص مع السماح للمستخدم بتعديلها أو الكتابة فوقها
+                goalsBox.innerText = selectedProgram.goals || '';
+                methodBox.innerText = selectedProgram.method || '';
+            } else {
+                goalsBox.innerText = '';
+                methodBox.innerText = '';
+            }
+        }
 
         function handleWitness(input, targetId) {
             const container = document.getElementById(targetId);
@@ -312,7 +430,8 @@
         }
 
         function clearForm() {
-            document.querySelectorAll('input, select').forEach(el => el.value = '');
+            document.getElementById('programName').value = '';
+            document.querySelectorAll('input, select:not(#programName)').forEach(el => el.value = '');
             document.getElementById('hijriYear').value = '';
             document.getElementById('hijriMonth').value = '';
             document.getElementById('hijriDay').value = '';
